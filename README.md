@@ -85,7 +85,7 @@ http://127.0.0.1:8080
 ## Project structure
 
 ```text
-Medical-Chatbot-with-LLMs-LangChain-Pinecone-Flask-AWS/
+Medical-Chatbot-with-LLMs-LangChain-Pinecone-Flask/
 ├── data/
 │   └── Medical_book.pdf
 ├── research/
