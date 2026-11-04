@@ -1,81 +1,441 @@
-<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-
 <!DOCTYPE html>
-<html>
-	<head>
-		<title>Chatbot</title>
-		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-		<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css')}}"/>
-	</head>
-	
-	
-	<body>
-		<div class="container-fluid h-100">
-			<div class="row justify-content-center h-100">		
-				<div class="col-md-8 col-xl-6 chat">
-					<div class="card">
-						<div class="card-header msg_head">
-							<div class="d-flex bd-highlight">
-								<div class="img_cont">
-									<img src="https://cdn-icons-png.flaticon.com/512/387/387569.png" class="rounded-circle user_img">
-									<!-- <img src="https://www.prdistribution.com/spirit/uploads/pressreleases/2019/newsreleases/d83341deb75c4c4f6b113f27b1e42cd8-chatbot-florence-already-helps-thousands-of-patients-to-remember-their-medication.png" class="rounded-circle user_img"> -->
-									<span class="online_icon"></span>
-								</div>
-								<div class="user_info">
-									<span>Medical Chatbot</span>
-									<p>Ask me anything!</p>
-								</div>
-							</div>
-						</div>
-						<div id="messageFormeight" class="card-body msg_card_body">
-							
-							
-						</div>
-						<div class="card-footer">
-							<form id="messageArea" class="input-group">
-                                <input type="text" id="text" name="msg" placeholder="Type your message..." autocomplete="off" class="form-control type_msg" required/>
-								<div class="input-group-append">
-									<button type="submit" id="send" class="input-group-text send_btn"><i class="fas fa-location-arrow"></i></button>
-								</div>
-							</form>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-		
-		<script>
-			$(document).ready(function() {
-				$("#messageArea").on("submit", function(event) {
-					const date = new Date();
-					const hour = date.getHours();
-					const minute = date.getMinutes();
-					const str_time = hour+":"+minute;
-					var rawText = $("#text").val();
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#063f3d">
+    <meta name="description" content="MediBot — an AI healthcare assistant for medical questions.">
+    <title>MediBot | AI Healthcare Assistant</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="app-shell" id="appShell">
+        <div class="sidebar-scrim" id="sidebarScrim"></div>
 
-					var userHtml = '<div class="d-flex justify-content-end mb-4"><div class="msg_cotainer_send">' + rawText + '<span class="msg_time_send">'+ str_time + '</span></div><div class="img_cont_msg"><img src="https://i.ibb.co/d5b84Xw/Untitled-design.png" class="rounded-circle user_img_msg"></div></div>';
-					
-					$("#text").val("");
-					$("#messageFormeight").append(userHtml);
+        <aside class="sidebar" id="sidebar" aria-label="Main navigation">
+            <a class="brand" href="/" aria-label="MediBot home">
+                <span class="brand-mark" aria-hidden="true">
+                    <svg viewBox="0 0 48 48" fill="none">
+                        <path d="M5 25h9l5-11 8 22 6-15 3 4h8" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M24 4.5c10.77 0 19.5 8.73 19.5 19.5S34.77 43.5 24 43.5 4.5 34.77 4.5 24 13.23 4.5 24 4.5Z" stroke="currentColor" stroke-opacity=".3" stroke-width="1.5"/>
+                    </svg>
+                </span>
+                <span class="brand-copy">
+                    <strong>MediBot</strong>
+                    <small>AI Healthcare Assistant</small>
+                </span>
+            </a>
 
-					$.ajax({
-						data: {
-							msg: rawText,	
-						},
-						type: "POST",
-						url: "/get",
-					}).done(function(data) {
-						var botHtml = '<div class="d-flex justify-content-start mb-4"><div class="img_cont_msg"><img src="https://cdn-icons-png.flaticon.com/512/387/387569.png" class="rounded-circle user_img_msg"></div><div class="msg_cotainer">' + data + '<span class="msg_time">' + str_time + '</span></div></div>';
-						$("#messageFormeight").append($.parseHTML(botHtml));
-					});
-					event.preventDefault();
-				});
-			});
-		</script>
-        
-    </body>
+            <div class="sidebar-label">WORKSPACE</div>
+            <nav class="side-nav">
+                <button class="nav-item is-active" id="chatNav" type="button">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H6l-3 2v-6.5A7.5 7.5 0 1 1 20 11.5Z"/><path d="M8 11h8M8 14.5h5"/></svg>
+                    <span>Chat</span>
+                    <span class="nav-dot"></span>
+                </button>
+                <button class="nav-item" id="resourcesNav" type="button">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A3.5 3.5 0 0 1 7.5 2H20v17H7.5A3.5 3.5 0 0 0 4 22V5.5Z"/><path d="M4 6h12M8 7.5v7l2.5-1.5 2.5 1.5v-7"/></svg>
+                    <span>Medical Resources</span>
+                </button>
+                <button class="nav-item" id="aboutNav" type="button">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.5h.01"/></svg>
+                    <span>About MediBot</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-spacer"></div>
+
+            <section class="sidebar-promo" aria-label="MediBot information">
+                <div class="promo-art" aria-hidden="true">
+                    <svg viewBox="0 0 120 100" fill="none">
+                        <path d="M28 22h53a8 8 0 0 1 8 8v49H20V30a8 8 0 0 1 8-8Z" stroke="currentColor" stroke-width="3"/>
+                        <path d="M35 39h39M35 52h29M35 65h35" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                        <path d="M87 56c0 0 18 5 18 5v15c0 10-8 16-18 21-10-5-18-11-18-21V61l18-5Z" fill="#7de6c3" stroke="#d4fff1" stroke-width="2"/>
+                        <path d="m79 76 6 6 11-13" stroke="#07534b" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="m12 16 3 6 6 3-6 3-3 6-3-6-6-3 6-3 3-6Z" fill="#80efd0"/>
+                        <path d="m97 8 2.5 5 5 2.5-5 2.5-2.5 5-2.5-5-5-2.5 5-2.5 2.5-5Z" fill="#80efd0"/>
+                    </svg>
+                </div>
+                <h2>Health answers, made simpler.</h2>
+                <p>Explore medical information with your AI-powered assistant.</p>
+                <span class="promo-caption"><span class="status-pulse"></span> Document-based assistance</span>
+            </section>
+
+            <div class="sidebar-footer">
+                <span class="footer-avatar">P</span>
+                <span class="footer-user"><strong>Personal workspace</strong><small>MediBot project</small></span>
+                <span class="footer-status" title="Local app"><i></i></span>
+            </div>
+            <div class="sidebar-waves" aria-hidden="true"></div>
+        </aside>
+
+        <main class="main-panel">
+            <header class="topbar">
+                <button class="mobile-menu icon-button" id="mobileMenu" type="button" aria-label="Open navigation">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+                </button>
+                <div class="topbar-context">
+                    <span class="context-kicker">YOUR HEALTH COMPANION</span>
+                    <span class="context-title">AI Medical Assistant</span>
+                </div>
+                <div class="topbar-actions">
+                    <button class="icon-button" id="themeToggle" type="button" aria-label="Switch to dark theme" title="Toggle theme">
+                        <svg class="sun-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg>
+                    </button>
+                    <a class="icon-button github-button" href="https://github.com/prempatil1/Medical-Chatbot-with-LLMs-LangChain-Pinecone-Flask-AWS" target="_blank" rel="noopener noreferrer" aria-label="Open MediBot GitHub repository" title="View on GitHub">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 19c-4.2 1.3-4.2-2.1-5.9-2.5M14.9 21v-3.4a3 3 0 0 0-.8-2.3c2.7-.3 5.5-1.3 5.5-6A4.7 4.7 0 0 0 18.3 6a4.3 4.3 0 0 0-.1-3.2s-1-.3-3.3 1.3a11.5 11.5 0 0 0-6 0C6.6 2.5 5.6 2.8 5.6 2.8A4.3 4.3 0 0 0 5.5 6a4.7 4.7 0 0 0-1.3 3.3c0 4.7 2.8 5.7 5.5 6a3 3 0 0 0-.8 2.3V21"/></svg>
+                    </a>
+                </div>
+            </header>
+
+            <div class="content-wrap">
+                <section class="welcome-view" id="welcomeView">
+                    <div class="hero-section">
+                        <div class="mascot-wrap" aria-hidden="true">
+                            <div class="mascot-orbit orbit-one"></div>
+                            <div class="mascot-orbit orbit-two"></div>
+                            <div class="mascot-glow"></div>
+                            <svg class="mascot" viewBox="0 0 180 170" fill="none">
+                                <ellipse cx="90" cy="151" rx="46" ry="8" fill="#b5eadb" opacity=".55"/>
+                                <path d="M58 112c0-22 14-38 32-38s32 16 32 38v28H58v-28Z" fill="#f7fffc" stroke="#b9d9d2" stroke-width="3"/>
+                                <path d="M74 111h32v30H74z" fill="#e7f8f2"/>
+                                <path d="M90 116v17m-8.5-8.5h17" stroke="#12a77c" stroke-width="5" stroke-linecap="round"/>
+                                <rect x="37" y="35" width="106" height="81" rx="29" fill="#e6fbf4" stroke="#a6d9cb" stroke-width="3"/>
+                                <rect x="45" y="43" width="90" height="64" rx="23" fill="#073f43"/>
+                                <path d="M62 69c4-8 13-8 17 0M101 69c4-8 13-8 17 0" stroke="#5be0bd" stroke-width="5" stroke-linecap="round"/>
+                                <path d="M78 85c7 7 17 7 24 0" stroke="#8df0d3" stroke-width="4" stroke-linecap="round"/>
+                                <rect x="25" y="64" width="13" height="30" rx="6.5" fill="#11a47d"/>
+                                <rect x="142" y="64" width="13" height="30" rx="6.5" fill="#11a47d"/>
+                                <path d="M76 34v-9c0-8 6-14 14-14s14 6 14 14v9" stroke="#a6d9cb" stroke-width="5" stroke-linecap="round"/>
+                                <circle cx="90" cy="10" r="5" fill="#16ae83"/>
+                                <circle cx="144" cy="38" r="7" fill="#c4f4e6"/>
+                                <path d="m145 31 2 5 5 2-5 2-2 5-2-5-5-2 5-2 2-5Z" fill="#21b58d"/>
+                            </svg>
+                        </div>
+                        <div class="hero-copy">
+                            <p class="eyebrow"><span class="eyebrow-line"></span> WELCOME TO MEDIBOT</p>
+                            <h1>Hi, I'm <span>MediBot</span><span class="wave-emoji">👋</span></h1>
+                            <h2>Your AI-powered medical assistant</h2>
+                            <p class="hero-description">Get helpful answers to your health and medical questions, powered by information retrieved from medical documents.</p>
+                        </div>
+                    </div>
+
+                    <div class="trust-row" aria-label="Assistant capabilities">
+                        <div class="trust-pill"><span class="trust-icon shield-icon"><svg viewBox="0 0 24 24"><path d="m12 3 8 3v5c0 5-3.4 8.5-8 10-4.6-1.5-8-5-8-10V6l8-3Z"/><path d="m8.5 12 2.2 2.2 4.8-5"/></svg></span>Trusted sources</div>
+                        <div class="trust-pill"><span class="trust-icon"><svg viewBox="0 0 24 24"><path d="m13 2-9 12h7l-1 8 10-13h-7l1-7Z"/></svg></span>Quick answers</div>
+                        <div class="trust-pill"><span class="trust-icon"><svg viewBox="0 0 24 24"><path d="M5 3h9l5 5v13H5z"/><path d="M14 3v5h5M8 13h8M8 17h8"/></svg></span>Document-based (RAG)</div>
+                        <div class="trust-pill"><span class="trust-icon"><svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 1 1 8 0v3m-4 4v3"/></svg></span>Privacy-conscious</div>
+                    </div>
+
+                    <section class="suggestions-section" aria-labelledby="suggestionsTitle">
+                        <div class="section-heading">
+                            <span class="sparkle-mark" aria-hidden="true">✦</span>
+                            <h2 id="suggestionsTitle">What would you like to know?</h2>
+                            <span class="section-subtitle">Start with a suggested question</span>
+                        </div>
+                        <div class="suggestion-grid">
+                            <button class="suggestion-card" type="button" data-question="What are the common symptoms of asthma?">
+                                <span class="suggestion-icon lungs"><svg viewBox="0 0 24 24"><path d="M12 4v7m0 0c-2-4-4-6-5-4-2 3-3 7-3 10 0 2 2 3 4 2 3-1 4-4 4-8Zm0 0c2-4 4-6 5-4 2 3 3 7 3 10 0 2-2 3-4 2-3-1-4-4-4-8Z"/></svg></span>
+                                <span class="suggestion-text"><strong>Asthma symptoms</strong><small>Learn about common signs</small></span>
+                                <span class="suggestion-arrow">↗</span>
+                            </button>
+                            <button class="suggestion-card" type="button" data-question="What should I know about paracetamol and its side effects?">
+                                <span class="suggestion-icon pills"><svg viewBox="0 0 24 24"><path d="m8 4 12 12a4.2 4.2 0 0 1-6 6L2 10a4.2 4.2 0 0 1 6-6Z"/><path d="m8 16 8-8"/></svg></span>
+                                <span class="suggestion-text"><strong>Medicine information</strong><small>Uses and possible side effects</small></span>
+                                <span class="suggestion-arrow">↗</span>
+                            </button>
+                            <button class="suggestion-card" type="button" data-question="How can diabetes be managed?">
+                                <span class="suggestion-icon heart"><svg viewBox="0 0 24 24"><path d="M20.8 8.7c0 5.4-8.8 11-8.8 11s-8.8-5.6-8.8-11A4.7 4.7 0 0 1 12 6.5a4.7 4.7 0 0 1 8.8 2.2Z"/><path d="M7.5 12h3l1.5-3 2 6 1.5-3h1.5"/></svg></span>
+                                <span class="suggestion-text"><strong>Diabetes care</strong><small>Understand management basics</small></span>
+                                <span class="suggestion-arrow">↗</span>
+                            </button>
+                            <button class="suggestion-card" type="button" data-question="What are some habits for a healthy lifestyle?">
+                                <span class="suggestion-icon leaf"><svg viewBox="0 0 24 24"><path d="M20 4c-8 0-14 3-14 10a6 6 0 0 0 6 6c7 0 10-7 8-16Z"/><path d="M4 21c3-6 7-9 13-12"/></svg></span>
+                                <span class="suggestion-text"><strong>Healthy lifestyle</strong><small>Everyday wellness habits</small></span>
+                                <span class="suggestion-arrow">↗</span>
+                            </button>
+                        </div>
+                    </section>
+
+                    <div class="welcome-note"><span class="note-icon">✦</span><span>Ask a question to begin your conversation. MediBot's responses are for general information only.</span></div>
+                </section>
+
+                <section class="conversation-view" id="conversationView" hidden aria-label="Chat conversation">
+                    <div class="conversation-heading">
+                        <div>
+                            <p class="eyebrow">YOUR CONVERSATION</p>
+                            <h1>Let's talk about your health.</h1>
+                        </div>
+                        <button class="new-chat-button" id="newChatButton" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>New chat</button>
+                    </div>
+                    <div class="message-list" id="messageList" aria-live="polite" aria-relevant="additions"></div>
+                </section>
+
+                <div class="composer-area">
+                    <form class="composer" id="messageForm">
+                        <label class="sr-only" for="messageInput">Type your medical question</label>
+                        <textarea id="messageInput" name="msg" rows="1" maxlength="2000" placeholder="Type your medical question..." required></textarea>
+                        <div class="composer-bottom">
+                            <span class="composer-hint"><span class="composer-sparkle">✦</span> MediBot can make mistakes. Verify important medical information.</span>
+                            <div class="composer-controls">
+                                <span class="character-count" id="characterCount">0 / 2000</span>
+                                <button class="send-button" id="sendButton" type="submit" aria-label="Send message" title="Send message">
+                                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 3-7.2 18-3.5-7.3L3 10.2 21 3Z"/><path d="M10.3 13.7 21 3"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    <p class="medical-disclaimer"><span>ⓘ</span> MediBot is not a substitute for professional medical advice, diagnosis, or treatment.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-backdrop" id="infoModal" hidden>
+        <section class="info-modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+            <button class="modal-close" id="modalClose" type="button" aria-label="Close dialog">×</button>
+            <div class="modal-symbol" id="modalSymbol">✦</div>
+            <p class="eyebrow">MEDIBOT INFORMATION</p>
+            <h2 id="modalTitle">About MediBot</h2>
+            <div class="modal-copy" id="modalCopy"></div>
+            <button class="modal-action" id="modalAction" type="button">Got it</button>
+        </section>
+    </div>
+
+    <script>
+        (() => {
+            const welcomeView = document.getElementById('welcomeView');
+            const conversationView = document.getElementById('conversationView');
+            const messageList = document.getElementById('messageList');
+            const messageForm = document.getElementById('messageForm');
+            const messageInput = document.getElementById('messageInput');
+            const sendButton = document.getElementById('sendButton');
+            const characterCount = document.getElementById('characterCount');
+            const themeToggle = document.getElementById('themeToggle');
+            const infoModal = document.getElementById('infoModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalCopy = document.getElementById('modalCopy');
+            const sidebar = document.getElementById('sidebar');
+            const sidebarScrim = document.getElementById('sidebarScrim');
+            const mobileMenu = document.getElementById('mobileMenu');
+            let isSending = false;
+
+            const icons = {
+                bot: '<svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><rect x="7" y="10" width="34" height="27" rx="10" fill="#e1fbf2"/><rect x="11" y="14" width="26" height="19" rx="7" fill="#07504c"/><path d="M17 22c1.5-3 4.5-3 6 0m3 0c1.5-3 4.5-3 6 0" stroke="#67e6c0" stroke-width="2.5" stroke-linecap="round"/><path d="M20 28c2.5 2 5.5 2 8 0" stroke="#a4f5dd" stroke-width="2" stroke-linecap="round"/><path d="M24 10V6" stroke="#0e9676" stroke-width="2.5" stroke-linecap="round"/><circle cx="24" cy="5" r="2" fill="#0e9676"/></svg>',
+                user: '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c.5-4.2 3.2-6.5 8-6.5s7.5 2.3 8 6.5"/></svg>'
+            };
+
+            function getTime() {
+                return new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit' }).format(new Date());
+            }
+
+            function createMessage(role, text, isError = false) {
+                const row = document.createElement('article');
+                row.className = `message-row ${role === 'user' ? 'message-user' : 'message-assistant'}${isError ? ' message-error' : ''}`;
+
+                const avatar = document.createElement('div');
+                avatar.className = `message-avatar ${role === 'user' ? 'user-avatar' : 'bot-avatar'}`;
+                avatar.innerHTML = role === 'user' ? icons.user : icons.bot;
+
+                const body = document.createElement('div');
+                body.className = 'message-body';
+                const label = document.createElement('div');
+                label.className = 'message-label';
+                label.textContent = role === 'user' ? 'You' : 'MediBot';
+                const bubble = document.createElement('div');
+                bubble.className = 'message-bubble';
+                // Render model output as text, not HTML, so returned content cannot inject markup.
+                bubble.textContent = text;
+                const time = document.createElement('time');
+                time.className = 'message-time';
+                time.textContent = getTime();
+
+                body.append(label, bubble, time);
+                if (role === 'user') row.append(body, avatar);
+                else row.append(avatar, body);
+                messageList.appendChild(row);
+                messageList.scrollTop = messageList.scrollHeight;
+                return row;
+            }
+
+            function showConversation() {
+                welcomeView.hidden = true;
+                conversationView.hidden = false;
+                document.getElementById('chatNav').classList.add('is-active');
+                document.getElementById('resourcesNav').classList.remove('is-active');
+                document.getElementById('aboutNav').classList.remove('is-active');
+            }
+
+            function resetChat() {
+                messageList.replaceChildren();
+                conversationView.hidden = true;
+                welcomeView.hidden = false;
+                messageInput.value = '';
+                updateCharacterCount();
+                document.getElementById('chatNav').classList.add('is-active');
+                document.getElementById('resourcesNav').classList.remove('is-active');
+                document.getElementById('aboutNav').classList.remove('is-active');
+                messageInput.focus();
+            }
+
+            function setSending(sending) {
+                isSending = sending;
+                sendButton.disabled = sending;
+                sendButton.classList.toggle('is-loading', sending);
+                messageInput.disabled = sending;
+                sendButton.setAttribute('aria-label', sending ? 'Sending message' : 'Send message');
+            }
+
+            function updateCharacterCount() {
+                characterCount.textContent = `${messageInput.value.length} / 2000`;
+            }
+
+            function addTypingIndicator() {
+                const row = document.createElement('article');
+                row.className = 'message-row message-assistant typing-row';
+                row.innerHTML = `<div class="message-avatar bot-avatar">${icons.bot}</div><div class="message-body"><div class="message-label">MediBot is thinking</div><div class="typing-bubble"><i></i><i></i><i></i></div></div>`;
+                messageList.appendChild(row);
+                messageList.scrollTop = messageList.scrollHeight;
+                return row;
+            }
+
+            async function sendMessage(text) {
+                const trimmed = text.trim();
+                if (!trimmed || isSending) return;
+                showConversation();
+                createMessage('user', trimmed);
+                messageInput.value = '';
+                updateCharacterCount();
+                setSending(true);
+                const typing = addTypingIndicator();
+
+                try {
+                    const response = await fetch('/get', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+                        body: new URLSearchParams({ msg: trimmed })
+                    });
+                    const answer = await response.text();
+                    typing.remove();
+                    if (!response.ok) {
+                        throw new Error(`The server returned an error (${response.status}).`);
+                    }
+                    if (!answer.trim()) {
+                        throw new Error('MediBot returned an empty response. Please try again.');
+                    }
+                    createMessage('assistant', answer.trim());
+                } catch (error) {
+                    typing.remove();
+                    createMessage('assistant', 'Sorry, I could not get a response just now. Please check that the Flask app is running and your API connections are configured, then try again.', true);
+                    console.error('MediBot request failed:', error);
+                } finally {
+                    setSending(false);
+                    messageInput.disabled = false;
+                    messageInput.focus();
+                }
+            }
+
+            messageForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+                sendMessage(messageInput.value);
+            });
+
+            messageInput.addEventListener('input', updateCharacterCount);
+            messageInput.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter' && !event.shiftKey) {
+                    event.preventDefault();
+                    messageForm.requestSubmit();
+                }
+            });
+
+            document.querySelectorAll('[data-question]').forEach((button) => {
+                button.addEventListener('click', () => sendMessage(button.dataset.question));
+            });
+
+            document.getElementById('newChatButton').addEventListener('click', resetChat);
+            document.getElementById('chatNav').addEventListener('click', () => {
+                resetChat();
+                closeSidebar();
+            });
+
+            function openModal(title, paragraphs, symbol) {
+                modalTitle.textContent = title;
+                modalCopy.replaceChildren();
+                paragraphs.forEach((paragraph) => {
+                    const p = document.createElement('p');
+                    p.textContent = paragraph;
+                    modalCopy.appendChild(p);
+                });
+                document.getElementById('modalSymbol').textContent = symbol;
+                infoModal.hidden = false;
+                document.getElementById('modalClose').focus();
+            }
+
+            function closeModal() {
+                infoModal.hidden = true;
+            }
+
+            document.getElementById('resourcesNav').addEventListener('click', () => {
+                document.getElementById('resourcesNav').classList.add('is-active');
+                document.getElementById('chatNav').classList.remove('is-active');
+                document.getElementById('aboutNav').classList.remove('is-active');
+                openModal('Medical resources', [
+                    'MediBot uses a document-based retrieval workflow. The project includes a medical reference PDF in its data folder, which is processed into text chunks and stored in Pinecone for retrieval.',
+                    'Answers are generated from retrieved context. The assistant may not have enough information for every question, and responses should be checked with a qualified healthcare professional.'
+                ], '✚');
+                closeSidebar();
+            });
+
+            document.getElementById('aboutNav').addEventListener('click', () => {
+                document.getElementById('aboutNav').classList.add('is-active');
+                document.getElementById('chatNav').classList.remove('is-active');
+                document.getElementById('resourcesNav').classList.remove('is-active');
+                openModal('About MediBot', [
+                    'MediBot is an AI healthcare question-answering project built with Flask, LangChain, Pinecone, Hugging Face embeddings, and Groq.',
+                    'It is designed to help explore medical information. It does not diagnose conditions, prescribe medication, or replace a clinician.'
+                ], '✦');
+                closeSidebar();
+            });
+
+            document.getElementById('modalClose').addEventListener('click', closeModal);
+            document.getElementById('modalAction').addEventListener('click', closeModal);
+            infoModal.addEventListener('click', (event) => {
+                if (event.target === infoModal) closeModal();
+            });
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape') {
+                    closeModal();
+                    closeSidebar();
+                }
+            });
+
+            themeToggle.addEventListener('click', () => {
+                const dark = document.body.classList.toggle('dark-theme');
+                themeToggle.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
+                try { localStorage.setItem('medibot-theme', dark ? 'dark' : 'light'); } catch (_) { /* storage may be disabled */ }
+            });
+            try {
+                if (localStorage.getItem('medibot-theme') === 'dark') {
+                    document.body.classList.add('dark-theme');
+                    themeToggle.setAttribute('aria-label', 'Switch to light theme');
+                }
+            } catch (_) { /* storage may be disabled */ }
+
+            function closeSidebar() {
+                sidebar.classList.remove('sidebar-open');
+                sidebarScrim.classList.remove('scrim-visible');
+            }
+            mobileMenu.addEventListener('click', () => {
+                sidebar.classList.toggle('sidebar-open');
+                sidebarScrim.classList.toggle('scrim-visible');
+            });
+            sidebarScrim.addEventListener('click', closeSidebar);
+
+            updateCharacterCount();
+        })();
+    </script>
+</body>
 </html>
