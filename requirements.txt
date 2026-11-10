@@ -1,3 +1,4 @@
+--extra-index-url https://download.pytorch.org/whl/cpu
 langchain==0.3.26
 flask==3.1.1 
 sentence-transformers==4.1.0
@@ -7,4 +8,4 @@ langchain-pinecone==0.2.8
 langchain-huggingface==0.1.2
 langchain-community==0.3.26
 langchain-groq==0.3.8
--e .
+gunicorn
